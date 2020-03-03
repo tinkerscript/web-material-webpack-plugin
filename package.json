@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "main": "src/index.js",
   "repository": "git@github.com:tinkerscript/web-material-webpack-plugin.git",
-  "author": "tinkerscript",
+  "author": "tinker",
   "license": "MIT",
   "dependencies": {
     "schema-utils": "2.6.4"
