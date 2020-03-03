@@ -1,22 +1,31 @@
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
+const validateOptions = require('schema-utils');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { parse } = require('node-html-parser');
+const schema = require('./WebMaterial.schema.json');
+
 const readFile = promisify(fs.readFile);
 
-module.exports = class WebMaterialPlugin {
-  constructor({ test }) {
-    this._pattern = test;
-  }
+const PLUGIN_NAME = 'WebMaterialPlugin';
 
+module.exports = class WebMaterialPlugin {
+  constructor(options) {
+    validateOptions(schema, options, {
+      baseDataPath: 'options',
+      name: PLUGIN_NAME
+    });
+    
+    this.options = options;
+  }
   apply(compiler) {
-    compiler.hooks.compilation.tap('WebMaterialPlugin', compilation => {
+    compiler.hooks.compilation.tap(PLUGIN_NAME, compilation => {
       HtmlWebpackPlugin
         .getHooks(compilation)
         .alterAssetTagGroups
-        .tapAsync('WebMaterialPlugin', async (data, cb) => {
-          const tags = await createTemplateTags(Array.from(compilation.fileDependencies), this._pattern);
+        .tapAsync(PLUGIN_NAME, async (data, cb) => {
+          const tags = await createTemplateTags(Array.from(compilation.fileDependencies), this.options.test);
 
           tags.forEach(({ innerHTML, name }) => {
             data.headTags.push({
